@@ -47,7 +47,7 @@ export function MovieApplication()
     DESCENDING: 1
   }
   
-  const __internalSortMovieArray = (sortType) =>
+  const sortMovieArray = (sortType) =>
   {
     const movieArrayClone = movieArray.slice();
 
@@ -80,15 +80,6 @@ export function MovieApplication()
     }
     setMovieArray(movieArrayClone);
   }
-
-  const sortMovieArrayDescending = () => {
-    __internalSortMovieArray(Sort.DESCENDING);
-  }
-
-  const sortMovieArrayAscending = () => {
-    __internalSortMovieArray(Sort.ASCENDING);
-  }
-
 
   const sortButtonStyles = StyleSheet.create(
     {
@@ -160,11 +151,24 @@ export function MovieApplication()
     }
   );
 
+  const onSortButtonClick = () => {
+    // true => descending
+    // false => ascending
+    if(buttonState){
+      sortMovieArray(Sort.DESCENDING);
+    }
+    else{
+      sortMovieArray(Sort.ASCENDING);
+    }
+
+    setButtonState(!buttonState);
+  }
 
   const [movieArray, setMovieArray] = useState([]);
 
   const [performInitialLoad, setPerformInitialLoad] = useState(true);
 
+  const [buttonState, setButtonState] = useState(true);
 
   if(performInitialLoad)
   {
@@ -192,11 +196,8 @@ export function MovieApplication()
       }}></FlatList>
 
       <View style={sortButtonStyles.buttonWrapper}>
-        <TouchableOpacity style={sortButtonStyles.button} onPress={sortMovieArrayAscending}>
-          <Text style={sortButtonStyles.text}>SORT MOVIES - Ascending</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={sortButtonStyles.button} onPress={sortMovieArrayDescending}>
-          <Text style={sortButtonStyles.text}>SORT MOVIES - Descending</Text>
+        <TouchableOpacity style={sortButtonStyles.button} onPress={onSortButtonClick}>
+          <Text style={sortButtonStyles.text}>SORT MOVIES - {buttonState ? "Descending" : "Ascending"}</Text>
         </TouchableOpacity>
       </View>
 
