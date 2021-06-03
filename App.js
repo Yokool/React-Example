@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native';
 
 const MOVIES_URL = "https://raw.githubusercontent.com/RyanHemrick/star_wars_movie_app/master/movies.json";
@@ -9,6 +9,76 @@ const MOVIE_TITLE_KEY = "title";
 const MOVIE_EPISODE_NUM_KEY = "episode_number";
 const MOVIE_IMAGE_KEY = "poster";
 
+const sortButtonStyles = StyleSheet.create(
+  {
+    buttonWrapper:
+    {
+      width: "100%",
+      height: "300px",
+      backgroundColor: "#273043"
+    },
+    button:
+    {
+      width: "500px",
+      margin: "auto",
+      height: "100px",
+      backgroundColor: "#9197AE"
+    },
+    text:
+    {
+      color: "#EFF6EE",
+      textAlign: "center",
+      fontSize: "30px",
+      margin: "auto",
+      padding: "0px"
+    }
+  }
+);
+
+const FlatListStyles = StyleSheet.create(
+  {
+    outerDiv: {
+      backgroundColor: "#F02D3A",
+      width: "100%",
+      height: "auto"
+    },
+    innerDiv: {
+      width: "80%",
+      height: "600px",
+
+      marginTop: "5px",
+      marginBottom: "5px",
+
+      marginLeft: "auto",
+      marginRight: "auto",
+
+      backgroundColor: "#273043"
+    },
+    movieTitleHeader: {
+      color: "#EFF6EE",
+      margin: "0px",
+      textAlign: "center",
+      fontSize: "40px"
+    },
+    movieEpisodeNumber: {
+      color: "#EFF6EE",
+      margin: "0px",
+      textAlign: "center",
+      fontSize: "30px"
+    },
+    episodeText: {
+      fontSize: "30px"
+    },
+    image: {
+      width: "40%",
+      height: "450px",
+      marginLeft: "auto",
+      marginRight: "auto",
+      resizeMode: 'contain'
+    },
+  }
+);
+
 export default function App() {
   return (
     <MovieApplication></MovieApplication>
@@ -17,166 +87,50 @@ export default function App() {
 
 export function MovieApplication()
 {
-  
-
   const loadMoviesToMovieList = (setMovieArray) =>
   {
-    var moviesURLRequest = new XMLHttpRequest();
-    moviesURLRequest.addEventListener("loadend", function() {
-      onMoviesLoaded(this.responseText, setMovieArray);
+    fetch(MOVIES_URL).then((movieReqResponse) => {
+      movieReqResponse.json().then((movieJsonData) =>
+        {
+          setMovieArray(movieJsonData.movies);
+        }
+      )
     });
-    moviesURLRequest.open("GET", MOVIES_URL);
-    moviesURLRequest.send();
-  }
-
-  const onMoviesLoaded = (movieUnparsedJSON, setMovieArray) =>
-  {
-    var movieArray = parseTextToMovieArray(movieUnparsedJSON);
-    setMovieArray(movieArray);
-  }
-
-  const parseTextToMovieArray = (unparsedResponseText) =>
-  {
-    var moviesParsed = JSON.parse(unparsedResponseText);
-    var movieArray = moviesParsed.movies;
-    return movieArray;
   }
 
   const Sort = {
-    ASCENDING : -1,
-    DESCENDING: 1
+    ASCENDING : 1,
+    DESCENDING: -1
   }
   
   const sortMovieArray = (sortType) =>
   {
     const movieArrayClone = movieArray.slice();
-
-    for(var i = 0; i < movieArrayClone.length; ++i)
-    {
-      var diffIndex = i;
-
-      for(var j = i; j < movieArrayClone.length; ++j)
+    movieArrayClone.sort(
+      (movieA, movieB) =>
       {
-        var currTitle = movieArrayClone[diffIndex][MOVIE_TITLE_KEY];
-        var diffTitle = movieArrayClone[j][MOVIE_TITLE_KEY];
-        
-        var comp = diffTitle.localeCompare(currTitle) * sortType;
-        
-        if(comp > 0)
-        {
-          diffIndex = j;
-        }
-
+        return (movieA[MOVIE_TITLE_KEY].localeCompare(movieB[MOVIE_TITLE_KEY]) * sortType);
       }
-
-      if(diffIndex == i)
-      {
-        continue;
-      }
-
-      var buffer = movieArrayClone[i];
-      movieArrayClone[i] = movieArrayClone[diffIndex];
-      movieArrayClone[diffIndex] = buffer;
-    }
+    );
     setMovieArray(movieArrayClone);
   }
 
-  const sortButtonStyles = StyleSheet.create(
-    {
-      buttonWrapper:
-      {
-        width: "100%",
-        height: "300px",
-        backgroundColor: "#273043"
-      },
-      button:
-      {
-        width: "500px",
-        margin: "auto",
-        height: "100px",
-        backgroundColor: "#9197AE"
-      },
-      text:
-      {
-        color: "#EFF6EE",
-        textAlign: "center",
-        fontSize: "30px",
-        margin: "auto",
-        padding: "0px"
-      }
-    }
-  );
-
-  const FlatListStyles = StyleSheet.create(
-    {
-      outerDiv: {
-        backgroundColor: "#F02D3A",
-        width: "100%",
-        height: "auto"
-      },
-      innerDiv: {
-        width: "80%",
-        height: "600px",
-
-        marginTop: "5px",
-        marginBottom: "5px",
-
-        marginLeft: "auto",
-        marginRight: "auto",
-
-        backgroundColor: "#273043"
-      },
-      movieTitleHeader: {
-        color: "#EFF6EE",
-        margin: "0px",
-        textAlign: "center",
-        fontSize: "40px"
-      },
-      movieEpisodeNumber: {
-        color: "#EFF6EE",
-        margin: "0px",
-        textAlign: "center",
-        fontSize: "30px"
-      },
-      episodeText: {
-        fontSize: "30px"
-      },
-      image: {
-        width: "40%",
-        height: "450px",
-        marginLeft: "auto",
-        marginRight: "auto",
-        resizeMode: 'contain'
-      },
-    }
-  );
-
   const onSortButtonClick = () => {
-    // true => descending
-    // false => ascending
-    if(buttonState){
-      sortMovieArray(Sort.DESCENDING);
-    }
-    else{
-      sortMovieArray(Sort.ASCENDING);
-    }
-
     setButtonState(!buttonState);
   }
 
   const [movieArray, setMovieArray] = useState([]);
 
-  const [performInitialLoad, setPerformInitialLoad] = useState(true);
-
   const [buttonState, setButtonState] = useState(true);
 
-  if(performInitialLoad)
-  {
+  useEffect( () => {
     loadMoviesToMovieList(setMovieArray);
-    setPerformInitialLoad(false);
-  }
-  
-  
+  }, []);
+
+  useEffect( () => {
+    var sortType = buttonState ? Sort.ASCENDING : Sort.DESCENDING;
+    sortMovieArray(sortType);
+  }, [buttonState]);
 
   return (
     <View>
