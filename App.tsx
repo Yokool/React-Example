@@ -22,7 +22,7 @@ interface IFlatListStyles
   image : ImageStyle
 }
 
-const sortButtonStyles = StyleSheet.create<ISortButtonStyles>(
+const SortButtonStyles = StyleSheet.create<ISortButtonStyles>(
   {
     buttonWrapper:
     {
@@ -172,9 +172,9 @@ export const MovieApplication = () => {
         );
       }}></FlatList>
 
-      <View style={sortButtonStyles.buttonWrapper}>
-        <TouchableOpacity style={sortButtonStyles.button} onPress={onSortButtonClick}>
-          <Text style={sortButtonStyles.text}>SORT MOVIES - {buttonState ? "Descending" : "Ascending"}</Text>
+      <View style={SortButtonStyles.buttonWrapper}>
+        <TouchableOpacity style={SortButtonStyles.button} onPress={onSortButtonClick}>
+          <Text style={SortButtonStyles.text}>SORT MOVIES - {buttonState ? "Descending" : "Ascending"}</Text>
         </TouchableOpacity>
       </View>
 
