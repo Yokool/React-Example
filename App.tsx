@@ -5,24 +5,7 @@ const MOVIES_URL = "https://raw.githubusercontent.com/RyanHemrick/star_wars_movi
 
 const IMAGE_URL = "https://raw.githubusercontent.com/RyanHemrick/star_wars_movie_app/master/public/images/";
 
-interface ISortButtonStyles
-{
-  buttonWrapper: ViewStyle,
-  button: ViewStyle,
-  text : TextStyle
-}
-
-interface IFlatListStyles
-{
-  outerDiv: ViewStyle,
-  innerDiv: ViewStyle,
-  movieTitleHeader: TextStyle,
-  movieEpisodeNumber: TextStyle,
-  episodeText: TextStyle,
-  image : ImageStyle
-}
-
-const SortButtonStyles = StyleSheet.create<ISortButtonStyles>(
+const SortButtonStyles = StyleSheet.create(
   {
     buttonWrapper:
     {
@@ -48,7 +31,7 @@ const SortButtonStyles = StyleSheet.create<ISortButtonStyles>(
   }
 );
 
-const FlatListStyles = StyleSheet.create<IFlatListStyles>(
+const FlatListStyles = StyleSheet.create(
   {
     outerDiv: {
       backgroundColor: "#F02D3A",
@@ -116,18 +99,16 @@ export const MovieApplication = () => {
 
   const [buttonState, setButtonState] = useState(true);
 
-  const Sort = {
-    ASCENDING: 1,
-    DESCENDING: -1
-  } as const;
+  enum Sort {
+    ASCENDING = 1,
+    DESCENDING = -1
+  }
 
-  const loadMoviesToMovieList = () =>
+  const loadMoviesToMovieList = async () =>
   {
-    fetch(MOVIES_URL).then((movieReqResponse) => {
-      movieReqResponse.json().then((movieJsonData: MovieJSONData) => {
-        setMovieArray(movieJsonData.movies);
-      })
-    });
+    var movieReqResponse = await fetch(MOVIES_URL);
+    var movieJsonData: MovieJSONData = await movieReqResponse.json();
+    setMovieArray(movieJsonData.movies);
   }
 
   const sortMovieArray = (sortType: 1 | -1) =>
